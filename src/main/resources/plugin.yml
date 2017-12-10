@@ -1,0 +1,7 @@
+main: tk.hugo4715.golema.santabox
+name: SantaBox
+version: 1.0
+authors: [hugo4715]
+commands:
+   santabox:
+   

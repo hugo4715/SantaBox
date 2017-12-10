@@ -1,0 +1,32 @@
+CREATE TABLE IF NOT EXISTS `santabox_keys` (
+  `id` INTEGER AUTO_INCREMENT,
+  `uuid` VARCHAR(40) NOT NULL,
+  `amount` SMALLINT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+		
+CREATE TABLE IF NOT EXISTS `santabox_win` (
+  `id` INTEGER AUTO_INCREMENT,
+  `uuid` VARCHAR(40) NOT NULL,
+  `code` VARCHAR(40) NOT NULL,
+  `prize` MEDIUMTEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+		
+CREATE TABLE IF NOT EXISTS `santabox_prizes` (
+  `id` INTEGER AUTO_INCREMENT,
+  `prize` MEDIUMTEXT NOT NULL,
+  `left` SMALLINT NOT NULL,
+  `proba` FLOAT NOT NULL,
+  `rarity` MEDIUMTEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+INSERT INTO `santabox_keys` (`uuid`,`amount`) VALUES ('uuuuuuuuiiiiiiidddddddd',1);
+INSERT INTO `santabox_win` (`uuid`,`code`,`prize`) VALUES ('dfkjqsdfijd','code-code-code','clavier badass');
+INSERT INTO `santabox_prizes` (`prize`,`left`,`proba`) VALUES ('clavier badass','12',`0.45`,`legendaire`);
+
+Rareté:
+  - legendaire
+  - epic
+  - commun
