@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -17,6 +18,7 @@ import com.google.common.collect.Lists;
 import net.golema.database.api.builder.HologramBuilder;
 import net.golema.database.api.builder.items.heads.CustomSkull;
 import net.golema.database.api.particle.ParticleEffect;
+import net.golema.database.golemaplayer.GolemaPlayer;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.TileEntityEnderChest;
@@ -29,11 +31,28 @@ import tk.hugo4715.golema.santabox.util.EntityRegistry;
 public class BoxOpenAnimation {
 	
     public static void openBox(Player p, Box box) throws SQLException {
+    	Prize reward = null;
+    	
+    	try {
+			BoxPlugin.get().getDatabaseManager().addPlayerKeys(p.getUniqueId(), -1);
+			reward = BoxPlugin.get().getDatabaseManager().choosePrize();
+			BoxPlugin.get().getDatabaseManager().usePrize(reward);
+			BoxPlugin.get().getDatabaseManager().winPrize(p, reward);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour rï¿½gler le probleme.");
+		}
+    	
+    	
     	new BukkitRunnable() {
 			int ticks = 0;
 			Prize reward;
 			HologramBuilder holo;
-			ItemStack head = CustomSkull.getPlayerSkull("http://textures.minecraft.net/texture/e6799bfaa3a2c63ad85dd378e66d57d9a97a3f86d0d9f683c498632f4f5c");
+			//orb:
+			//http://textures.minecraft.net/texture/e6799bfaa3a2c63ad85dd378e66d57d9a97a3f86d0d9f683c498632f4f5c
+			//present:
+			//http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5
+			ItemStack head = CustomSkull.getPlayerSkull("http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5");
 			ArmorStand stand;
 			float pitch = 0;
 			@Override
@@ -51,7 +70,7 @@ public class BoxOpenAnimation {
 				if(stand != null){
 					float speed = (float) Math.sqrt(ticks) * 0.1f;
 					stand.setHeadPose(stand.getHeadPose().add(0, speed, 0));;
-					ParticleEffect.FIREWORKS_SPARK.display(0, 0,0, 0.1f, 1, stand.getEyeLocation(), Lists.newArrayList(Bukkit.getOnlinePlayers()));
+					ParticleEffect.FIREWORKS_SPARK.display(0, 0,0, 0.1f, 1, stand.getEyeLocation(), box.getBoxLocation().getWorld().getPlayers());
 				}
 				
 				if(ticks < 60 && ticks % 5 == 0){
@@ -70,30 +89,14 @@ public class BoxOpenAnimation {
 					EntityRegistry.add(stand);
 				
 				}else if(ticks == 60){
-					//select and give reward here
+					//show reward here
 					
-					try {
-						BoxPlugin.get().getDatabaseManager().addPlayerKeys(p, -1);
-						
-						reward = BoxPlugin.get().getDatabaseManager().choosePrize();
-						
-						
-						holo = new HologramBuilder();
-						holo.editLocation(box.getBoxLocation().clone().add(0.5, -1, 0.5));
-						holo.editMessage(reward.getRarity().getColor() + reward.getRarity().getFrench());
-						holo.sendToPlayers(Bukkit.getOnlinePlayers());
-						
-						stand.getEyeLocation().getWorld().strikeLightningEffect(stand.getEyeLocation());
-						
-						BoxPlugin.get().getDatabaseManager().usePrize(reward);
+					holo = new HologramBuilder();
+					holo.editLocation(box.getBoxLocation().clone().add(0.5, -1, 0.5));
+					holo.editMessage(reward.getRarity().getColor() + reward.getRarity().getFrench());
+					holo.sendToPlayers(box.getBoxLocation().getWorld().getPlayers());
 					
-					} catch (SQLException e) {
-						e.printStackTrace();
-						p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour régler le probleme.");
-					}
-				
-					
-					
+					GolemaPlayer gp = GolemaPlayer.getGolemaPlayer(p);
 					
 					//open chest
 					playChestAction(box.getBoxLocation(), true);

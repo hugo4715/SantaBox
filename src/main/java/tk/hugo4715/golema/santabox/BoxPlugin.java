@@ -14,6 +14,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import tk.hugo4715.golema.santabox.box.Box;
 import tk.hugo4715.golema.santabox.box.BoxManager;
+import tk.hugo4715.golema.santabox.cmd.SantaCMD;
 import tk.hugo4715.golema.santabox.listener.BoxListener;
 import tk.hugo4715.golema.santabox.prize.DatabaseManager;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
@@ -40,6 +41,8 @@ public class BoxPlugin extends JavaPlugin {
 		}	
 		
 		Bukkit.getPluginManager().registerEvents(new BoxListener(), this);
+		
+		getCommand("santabox").setExecutor(new SantaCMD());
 	}
 	
 	@Override
