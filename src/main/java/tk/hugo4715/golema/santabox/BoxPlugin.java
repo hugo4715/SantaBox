@@ -27,9 +27,6 @@ public class BoxPlugin extends JavaPlugin {
 	@Getter
 	private DatabaseManager databaseManager;
 
-	@Getter
-	private Set<Box> boxes = Sets.newHashSet();
-
 	@Override
 	public void onEnable() {
 		boxManager = new BoxManager();

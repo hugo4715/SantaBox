@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -104,10 +105,10 @@ public class DatabaseManager {
 		}
 	}
 
-	public void addPlayerKeys(Player p, int amount) throws SQLException {
+	public void addPlayerKeys(UUID target, int amount) throws SQLException {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(PreparedStatement ps = c.prepareStatement(ADD_KEYS_PLAYER)){
-				ps.setString(1, p.getUniqueId().toString());
+				ps.setString(1, target.toString());
 				ps.setInt(2, amount);
 				ps.setInt(3, amount);
 				ps.executeUpdate();
