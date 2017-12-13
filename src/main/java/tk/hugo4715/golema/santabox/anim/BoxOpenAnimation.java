@@ -57,6 +57,8 @@ public class BoxOpenAnimation {
 			//http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5
 			ItemStack head = CustomSkull.getPlayerSkull("http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5");
 			ArmorStand stand;
+			
+			
 			float pitch = 0;
 			@Override
 			public void run() {
@@ -66,6 +68,7 @@ public class BoxOpenAnimation {
 					playChestAction(box.getBoxLocation(), false);
 					box.opening.remove(p.getUniqueId());
 					box.isUsed().set(false);
+					reward.give(gp);
 					cancel();
 					return;
 				}
@@ -80,6 +83,9 @@ public class BoxOpenAnimation {
 						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1, pitch);
 						pitch += 0.1;
 				}
+				
+				
+				
 				
 				//one time events
 				if(ticks == 1){

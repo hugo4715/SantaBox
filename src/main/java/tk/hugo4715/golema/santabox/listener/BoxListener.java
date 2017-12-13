@@ -11,9 +11,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.google.common.collect.Maps;
 
-import tk.hugo4715.golema.santabox.BoxChooserGui;
 import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.box.Box;
+import tk.hugo4715.golema.santabox.gui.BoxChooserGui;
 
 public class BoxListener implements Listener {
 	private Map<Player,Long> antiSpam = Maps.newHashMap();

@@ -11,9 +11,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import net.golema.database.api.builder.HologramBuilder;
 import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.box.Box;
+import tk.hugo4715.golema.santabox.util.HologramBuilder;
 
 public class BoxHoloUpdater extends BukkitRunnable {
 
@@ -29,7 +29,7 @@ public class BoxHoloUpdater extends BukkitRunnable {
 					if(holos.containsKey(p)){
 						//player already have his hologram, check if we need to remove it
 						if(p.getLocation().distanceSquared(box.getBoxLocation()) > 32*32 || box.isUsed().get()){
-							holos.get(p).forEach(h -> h.destroy());
+							holos.get(p).forEach(HologramBuilder::destroy);
 							holos.remove(p);
 						}
 					}else{

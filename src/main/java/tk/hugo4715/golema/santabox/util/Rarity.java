@@ -1,19 +1,22 @@
 package tk.hugo4715.golema.santabox.util;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 
 public enum Rarity {
-	COMMON("Commun",ChatColor.GREEN),
-	EPIC("Epic",ChatColor.LIGHT_PURPLE),
-	LEGENDARY("Legendaire",ChatColor.GOLD),
+	COMMON("Commun",ChatColor.GREEN,Material.CLAY_BRICK),
+	EPIC("Epic",ChatColor.LIGHT_PURPLE,Material.GOLD_INGOT),
+	LEGENDARY("Legendaire",ChatColor.GOLD,Material.DIAMOND),
 	;
 	
 	private String french;
 	private ChatColor color;
+	private Material mat;
 	
-	private Rarity(String french, ChatColor color) {
+	private Rarity(String french, ChatColor color,Material mat) {
 		this.french = french;
 		this.color = color;
+		this.mat = mat;
 	}
 	
 	public String getFrench() {
@@ -22,6 +25,10 @@ public enum Rarity {
 	
 	public ChatColor getColor() {
 		return color;
+	}
+	
+	public Material getMaterial() {
+		return mat;
 	}
 	
 	public String getTag(){

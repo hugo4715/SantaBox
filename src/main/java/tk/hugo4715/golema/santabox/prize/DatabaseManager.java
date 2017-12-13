@@ -50,6 +50,7 @@ public class DatabaseManager {
 			"  `prize` MEDIUMTEXT NOT NULL UNIQUE,\r\n" + 
 			"  `left` SMALLINT NOT NULL,\r\n" + 
 			"  `proba` FLOAT NOT NULL,\r\n" + 
+			"  `marque` MEDIUMTEXT NOT NULL,\r\n" + 
 			"  PRIMARY KEY (`id`)\r\n" + 
 			");";
 
@@ -81,7 +82,7 @@ public class DatabaseManager {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(ResultSet rs = c.createStatement().executeQuery(GET_PRIZES)){
 				while(rs.next()) {
-					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.valueOf(rs.getString(5).toUpperCase()));
+					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.valueOf(rs.getString(5).toUpperCase()),rs.getString(6));
 					prizes.add(p);
 				}
 			}
@@ -151,6 +152,7 @@ public class DatabaseManager {
 		private int left;
 		private float proba;
 		private Rarity rarity;
+		private String marque;
 		
 		public void give(GolemaPlayer golemaPlayer) {
 			if(name.toLowerCase().contains("coins")){
