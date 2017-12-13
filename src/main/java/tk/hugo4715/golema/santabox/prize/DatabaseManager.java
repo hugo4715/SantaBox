@@ -8,13 +8,22 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.text.html.StyleSheet.BoxPainter;
+
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.Lists;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.golema.database.GolemaBukkitDatabase;
+import net.golema.database.golemaplayer.GolemaPlayer;
+import net.golema.database.golemaplayer.currency.Currency;
+import net.golema.database.golemaplayer.game.luckbox.ILuckBox;
+import net.golema.database.golemaplayer.game.luckbox.LuckBoxType;
+import net.golema.database.golemaplayer.rank.Rank;
+import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.util.RandomCollection;
 import tk.hugo4715.golema.santabox.util.Rarity;
 
@@ -72,7 +81,7 @@ public class DatabaseManager {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(ResultSet rs = c.createStatement().executeQuery(GET_PRIZES)){
 				while(rs.next()) {
-					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.fromName(rs.getString(5)));
+					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.valueOf(rs.getString(5).toUpperCase()));
 					prizes.add(p);
 				}
 			}
@@ -142,5 +151,52 @@ public class DatabaseManager {
 		private int left;
 		private float proba;
 		private Rarity rarity;
+		
+		public void give(GolemaPlayer golemaPlayer) {
+			if(name.toLowerCase().contains("coins")){
+				int amount = Integer.valueOf(name.split(" ")[0]);
+				golemaPlayer.addCoins(Currency.GCOINS, amount);
+			}else if(name.toLowerCase().contains("credit")){
+				int amount = Integer.valueOf(name.split(" ")[0]);
+				golemaPlayer.addCoins(Currency.GOLEMACREDITS, amount);
+			}else if(name.toLowerCase().contains("santabox")){
+				int amount = Integer.valueOf(name.split(" ")[0]);
+				try {
+					BoxPlugin.get().getDatabaseManager().addPlayerKeys(golemaPlayer.getUUID(), amount);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}else if(name.toLowerCase().contains("luckbox")){
+				final int amount = Integer.valueOf(name.split(" ")[0]);
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						for(int i = 0; i < amount; i++){
+							ILuckBox.addPlayerLuckBox(golemaPlayer.getUUID(), LuckBoxType.LUCKBOX_SKYWARS);
+						}
+					}
+				}.runTaskAsynchronously(BoxPlugin.get());
+			}else if(name.toLowerCase().contains("vip+")){
+				if(golemaPlayer.getRankPower() < Rank.VIPPLUS.getPower()){
+					golemaPlayer.setRank(Rank.VIPPLUS);
+				}
+			}else if(name.toLowerCase().contains("vip")){
+				if(golemaPlayer.getRankPower() < Rank.VIP.getPower()){
+					golemaPlayer.setRank(Rank.VIP);
+				}
+			}
+		}
+		
+		public boolean isAutomatic(){
+			if(name.toLowerCase().contains("coins")
+					|| name.toLowerCase().contains("santabox")
+					|| name.toLowerCase().contains("luckbox")
+					|| name.toLowerCase().contains("vip")
+					|| name.toLowerCase().contains("credit")
+					)return true;
+			
+			return false;
+		}
 	}
 }

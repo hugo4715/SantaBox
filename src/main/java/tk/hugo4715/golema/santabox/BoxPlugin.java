@@ -20,7 +20,7 @@ import tk.hugo4715.golema.santabox.prize.DatabaseManager;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
 
 public class BoxPlugin extends JavaPlugin {
-	public static final String PREFIX = ChatColor.WHITE + "[" + ChatColor.GOLD + "SantaBox" + ChatColor.WHITE + "] " + ChatColor.GREEN;
+	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "SkyWars" + ChatColor.WHITE + "│" + ChatColor.YELLOW;
 	
 	@Getter
 	private BoxManager boxManager;

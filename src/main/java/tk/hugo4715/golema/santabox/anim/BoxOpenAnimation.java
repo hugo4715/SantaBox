@@ -2,23 +2,23 @@ package tk.hugo4715.golema.santabox.anim;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Golem;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.google.common.collect.Lists;
-
-import net.golema.database.api.builder.HologramBuilder;
-import net.golema.database.api.builder.items.heads.CustomSkull;
-import net.golema.database.api.particle.ParticleEffect;
+import net.golema.database.GolemaBukkitDatabase;
 import net.golema.database.golemaplayer.GolemaPlayer;
+import net.golema.database.golemaplayer.rank.Rank;
+import net.golema.database.redis.spigot.RedisPubSubSpigot;
+import net.golema.database.support.builder.items.heads.CustomSkull;
+import net.golema.database.support.particle.ParticleEffect;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.TileEntityEnderChest;
@@ -27,11 +27,13 @@ import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.box.Box;
 import tk.hugo4715.golema.santabox.prize.DatabaseManager.Prize;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
+import tk.hugo4715.golema.santabox.util.HologramBuilder;
 
 public class BoxOpenAnimation {
 	
     public static void openBox(Player p, Box box) throws SQLException {
     	Prize reward = null;
+    	GolemaPlayer gp = GolemaPlayer.getGolemaPlayer(p);
     	
     	try {
 			BoxPlugin.get().getDatabaseManager().addPlayerKeys(p.getUniqueId(), -1);
@@ -43,6 +45,7 @@ public class BoxOpenAnimation {
 			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour r�gler le probleme.");
 		}
     	
+    	reward.give(gp);
     	
     	new BukkitRunnable() {
 			int ticks = 0;
@@ -96,7 +99,28 @@ public class BoxOpenAnimation {
 					holo.editMessage(reward.getRarity().getColor() + reward.getRarity().getFrench());
 					holo.sendToPlayers(box.getBoxLocation().getWorld().getPlayers());
 					
-					GolemaPlayer gp = GolemaPlayer.getGolemaPlayer(p);
+					reward.give(gp);
+					Rank rank = getRealRank(gp);
+					
+					switch(reward.getRarity()){
+					case COMMON:
+						p.sendMessage(BoxPlugin.PREFIX + "Vous venez d'obtenir " + reward.getRarity().getTag() + WordUtils.capitalizeFully(reward.getName()) + ChatColor.GREEN + ".");
+						break;
+					case EPIC:
+						Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1));
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + reward.getRarity().getTag() + " " + reward.getName());
+						break;
+					case LEGENDARY:
+						Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1));
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(" ");
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + reward.getRarity().getTag() + " " + reward.getName());
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(" ");
+						break;
+					}
+					
+					if(!reward.isAutomatic()){
+						p.sendMessage(BoxPlugin.PREFIX + "Vous pouvez des a present nous contacter en message privé sur twitter " + ChatColor.AQUA + " @GolemaMC" + ChatColor.YELLOW + " pour reclamer votre prix!");
+					}
 					
 					//open chest
 					playChestAction(box.getBoxLocation(), true);
@@ -122,4 +146,11 @@ public class BoxOpenAnimation {
         TileEntityEnderChest tileChest = (TileEntityEnderChest) world.getTileEntity(position);
         world.playBlockAction(position, tileChest.w(), 1, open ? 1 : 0);
     }
+	
+	private static Rank getRealRank(GolemaPlayer gp){
+		for(Rank r : Rank.values()){
+			if(r.getPower() == gp.getRankPower())return r;
+		}
+		return Rank.PLAYER;
+	}
 }
