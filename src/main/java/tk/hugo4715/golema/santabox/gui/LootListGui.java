@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.golema.database.support.builder.items.ItemBuilder;
 import tk.hugo4715.golema.santabox.BoxPlugin;
-import tk.hugo4715.golema.santabox.prize.DatabaseManager.Prize;
+import tk.hugo4715.golema.santabox.database.DatabaseManager.Prize;
 import tk.hugo4715.golema.santabox.util.AbstractGui;
 
 public class LootListGui extends AbstractGui {

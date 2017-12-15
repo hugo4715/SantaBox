@@ -25,7 +25,7 @@ import net.minecraft.server.v1_8_R3.TileEntityEnderChest;
 import net.minecraft.server.v1_8_R3.World;
 import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.box.Box;
-import tk.hugo4715.golema.santabox.prize.DatabaseManager.Prize;
+import tk.hugo4715.golema.santabox.database.DatabaseManager.Prize;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
 import tk.hugo4715.golema.santabox.util.HologramBuilder;
 

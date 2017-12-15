@@ -1,4 +1,4 @@
-package tk.hugo4715.golema.santabox.prize;
+package tk.hugo4715.golema.santabox.database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,30 +29,11 @@ import tk.hugo4715.golema.santabox.util.Rarity;
 
 public class DatabaseManager {
 
-	private static final String CREATE_TABLE1 = "CREATE TABLE IF NOT EXISTS `santabox_keys` (\r\n" + 
-			"  `id` INTEGER AUTO_INCREMENT,\r\n" + 
-			"  `uuid` VARCHAR(40) NOT NULL UNIQUE,\r\n" + 
-			"  `amount` SMALLINT NOT NULL,\r\n" + 
-			"  PRIMARY KEY (`id`)\r\n" + 
-			");";
+	private static final String CREATE_TABLE1 = "CREATE TABLE IF NOT EXISTS `santabox_keys` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL UNIQUE, `amount` SMALLINT NOT NULL, PRIMARY KEY (`id`));";
 
-	private static final String CREATE_TABLE2 = "CREATE TABLE IF NOT EXISTS `santabox_win` (\r\n" + 
-			"  `id` INTEGER AUTO_INCREMENT,\r\n" + 
-			"  `uuid` VARCHAR(40) NOT NULL,\r\n" + 
-			"  `code` VARCHAR(40) NOT NULL,\r\n" + 
-			"  `prize` MEDIUMTEXT NOT NULL,\r\n" + 
-			"  `prize` BOOL DEFAULT 0,\r\n" + 
-			"  PRIMARY KEY (`id`)\r\n" + 
-			");";
+	private static final String CREATE_TABLE2 = "CREATE TABLE IF NOT EXISTS `santabox_win` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL,`code` VARCHAR(40) NOT NULL, `prize` MEDIUMTEXT NOT NULL, `redeemed` BOOL DEFAULT 0, PRIMARY KEY (`id`));";
 
-	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` (\r\n" + 
-			"  `id` INTEGER AUTO_INCREMENT,\r\n" + 
-			"  `prize` MEDIUMTEXT NOT NULL UNIQUE,\r\n" + 
-			"  `left` SMALLINT NOT NULL,\r\n" + 
-			"  `proba` FLOAT NOT NULL,\r\n" + 
-			"  `marque` MEDIUMTEXT NOT NULL,\r\n" + 
-			"  PRIMARY KEY (`id`)\r\n" + 
-			");";
+	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` ( `id` INTEGER AUTO_INCREMENT, `prize` MEDIUMTEXT NOT NULL, `left` SMALLINT NOT NULL, `proba` FLOAT NOT NULL, `marque` MEDIUMTEXT NOT NULL, PRIMARY KEY (`id`));";
 
 	private static final String GET_PRIZES = "SELECT * FROM `santabox_prizes`;";
 	private static final String GET_KEYS_PLAYER = "SELECT * FROM `santabox_keys` WHERE `uuid` = ?;";
@@ -63,15 +44,15 @@ public class DatabaseManager {
 	public DatabaseManager() throws SQLException {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(Statement s = c.createStatement()){
-				s.executeUpdate(CREATE_TABLE1);
+				s.execute(CREATE_TABLE1);
 			}
 
 			try(Statement s = c.createStatement()){
-				s.executeUpdate(CREATE_TABLE2);
+				s.execute(CREATE_TABLE2);
 			}
 
 			try(Statement s = c.createStatement()){
-				s.executeUpdate(CREATE_TABLE3);
+				s.execute(CREATE_TABLE3);
 			}		
 		} 
 	}

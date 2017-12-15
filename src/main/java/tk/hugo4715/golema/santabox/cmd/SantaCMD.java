@@ -28,7 +28,7 @@ public class SantaCMD implements CommandExecutor{
 		boolean isPlayer = sender instanceof Player;
 
 
-		if(args.length >= 3 && args[0].equalsIgnoreCase("give") && (!isPlayer || GolemaPlayer.getGolemaPlayer((Player)sender).getRankPower() >= Rank.ADMINISTRATOR.getPower())){
+		if(args.length >= 3 && args[0].equalsIgnoreCase("give") && (!isPlayer || (BoxPlugin.DEV || GolemaPlayer.getGolemaPlayer((Player)sender).getRankPower() >= Rank.ADMINISTRATOR.getPower()))){
 			// /santabox give hugo4715 5
 
 			UUID target = UUIDFetcher.getUUID(args[1]);
@@ -51,7 +51,7 @@ public class SantaCMD implements CommandExecutor{
 		}else if(isPlayer && args.length >= 1 && args[0].equals("create")){
 			Player p = (Player)sender;
 			
-			if(GolemaPlayer.getGolemaPlayer(p).getRankPower() < Rank.DEVELOPER.getPower()){
+			if(!BoxPlugin.DEV && GolemaPlayer.getGolemaPlayer(p).getRankPower() < Rank.DEVELOPER.getPower()){
 				GolemaPlayer.getGolemaPlayer(p).sendMessageNoPermission();
 				return true;
 			}

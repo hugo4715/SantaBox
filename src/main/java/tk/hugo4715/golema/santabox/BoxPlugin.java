@@ -15,12 +15,13 @@ import net.md_5.bungee.api.ChatColor;
 import tk.hugo4715.golema.santabox.box.Box;
 import tk.hugo4715.golema.santabox.box.BoxManager;
 import tk.hugo4715.golema.santabox.cmd.SantaCMD;
+import tk.hugo4715.golema.santabox.database.DatabaseManager;
 import tk.hugo4715.golema.santabox.listener.BoxListener;
-import tk.hugo4715.golema.santabox.prize.DatabaseManager;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
 
 public class BoxPlugin extends JavaPlugin {
-	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "SkyWars" + ChatColor.WHITE + "│" + ChatColor.YELLOW;
+	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "SkyWars" + ChatColor.WHITE + " │ " + ChatColor.YELLOW;
+	public static boolean DEV;
 	
 	@Getter
 	private BoxManager boxManager;
@@ -30,6 +31,9 @@ public class BoxPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
+		DEV = getConfig().getBoolean("dev", false);
+		
 		boxManager = new BoxManager();
 		try {
 			databaseManager = new DatabaseManager();
@@ -41,6 +45,7 @@ public class BoxPlugin extends JavaPlugin {
 		}	
 		
 		Bukkit.getPluginManager().registerEvents(new BoxListener(), this);
+		
 		
 		getCommand("santabox").setExecutor(new SantaCMD());
 	}

@@ -1,4 +1,4 @@
-main: tk.hugo4715.golema.santabox
+main: tk.hugo4715.golema.santabox.BoxPlugin
 name: SantaBox
 version: 1.0
 authors: [hugo4715]
