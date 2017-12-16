@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.golema.database.GolemaBukkitDatabase;
 import net.golema.database.golemaplayer.GolemaPlayer;
+import net.golema.database.golemaplayer.UUIDFetcher;
 import net.golema.database.golemaplayer.currency.Currency;
 import net.golema.database.golemaplayer.game.luckbox.ILuckBox;
 import net.golema.database.golemaplayer.game.luckbox.LuckBoxType;
@@ -31,15 +32,15 @@ public class DatabaseManager {
 
 	private static final String CREATE_TABLE1 = "CREATE TABLE IF NOT EXISTS `santabox_keys` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL UNIQUE, `amount` SMALLINT NOT NULL, PRIMARY KEY (`id`));";
 
-	private static final String CREATE_TABLE2 = "CREATE TABLE IF NOT EXISTS `santabox_win` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL,`code` VARCHAR(40) NOT NULL, `prize` MEDIUMTEXT NOT NULL, `redeemed` BOOL DEFAULT 0, PRIMARY KEY (`id`));";
+	private static final String CREATE_TABLE2 = "CREATE TABLE IF NOT EXISTS `santabox_win` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL, `prize` MEDIUMTEXT NOT NULL, `redeemed` BOOL DEFAULT 0, PRIMARY KEY (`id`));";
 
-	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` ( `id` INTEGER AUTO_INCREMENT, `prize` MEDIUMTEXT NOT NULL, `left` SMALLINT NOT NULL, `proba` FLOAT NOT NULL, `marque` MEDIUMTEXT NOT NULL, PRIMARY KEY (`id`));";
+	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` ( `id` INTEGER AUTO_INCREMENT, `prize` MEDIUMTEXT NOT NULL, `left` SMALLINT NOT NULL, `proba` FLOAT NOT NULL,`rarity` MEDIUMTEXT NOT NULL, `marque` MEDIUMTEXT NOT NULL, PRIMARY KEY (`id`));";
 
 	private static final String GET_PRIZES = "SELECT * FROM `santabox_prizes`;";
-	private static final String GET_KEYS_PLAYER = "SELECT * FROM `santabox_keys` WHERE `uuid` = ?;";
+	private static final String GET_KEYS_PLAYER = "SELECT * FROM `santabox_keys` WHERE uuid=?;";
 	private static final String ADD_KEYS_PLAYER = "INSERT INTO `santabox_keys` (`uuid`, `amount`) VALUES (?,?) ON DUPLICATE KEY UPDATE amount=amount+?;";
 	private static final String PLAYER_WIN_PRIZE = "INSERT INTO `santabox_win` (`uuid`,`prize` ) VALUES (?,?);";
-	private static final String UPDATE_PRIZES = "UPDATE `santabox_prizes` SET left = GREATEST(0, left- 1) WHERE id = ?;";
+	private static final String UPDATE_PRIZES = "UPDATE santabox_prizes SET `left`=`left` - 1 WHERE `id`=? AND `left` > 0;";
 
 	public DatabaseManager() throws SQLException {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
@@ -63,7 +64,7 @@ public class DatabaseManager {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(ResultSet rs = c.createStatement().executeQuery(GET_PRIZES)){
 				while(rs.next()) {
-					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.valueOf(rs.getString(5).toUpperCase()),rs.getString(6));
+					Prize p = new Prize(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getFloat(4),Rarity.fromName(rs.getString(5)),rs.getString(6));
 					prizes.add(p);
 				}
 			}
@@ -84,12 +85,14 @@ public class DatabaseManager {
 	public int getPlayerKeys(Player p) throws SQLException {
 		try(Connection c = GolemaBukkitDatabase.INSTANCE.sqlManager.getRessource()){
 			try(PreparedStatement ps = c.prepareStatement(GET_KEYS_PLAYER)){
-				ps.setString(1, p.getUniqueId().toString());
+				ps.setString(1, UUIDFetcher.getUUID(GolemaPlayer.getGolemaPlayer(p).getPlayerRealName()).toString());
 
 				try(ResultSet rs = ps.executeQuery()){
 					if(rs.next()) {
+						System.out.println("returned " + rs.getInt("amount"));
 						return rs.getInt("amount");
 					}
+					System.out.println("nothing returned");
 					return 0;
 				}
 			}
@@ -110,7 +113,7 @@ public class DatabaseManager {
 	public Prize choosePrize() throws SQLException {
 		List<Prize> prizes = getPrizes();
 		RandomCollection<Prize> c = new RandomCollection<>();
-		prizes.stream().filter(p -> p.getLeft() > 0).forEach(p -> c.add(p.getProba(), p));
+		prizes.stream().filter(p -> p.getLeft() != 0).forEach(p -> c.add(p.getProba(), p));
 		
 		return c.next();
 	}
@@ -145,7 +148,7 @@ public class DatabaseManager {
 			}else if(name.toLowerCase().contains("santabox")){
 				int amount = Integer.valueOf(name.split(" ")[0]);
 				try {
-					BoxPlugin.get().getDatabaseManager().addPlayerKeys(golemaPlayer.getUUID(), amount);
+					BoxPlugin.get().getDatabaseManager().addPlayerKeys(UUIDFetcher.getUUID(golemaPlayer.getPlayerRealName()), amount);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -156,7 +159,7 @@ public class DatabaseManager {
 					@Override
 					public void run() {
 						for(int i = 0; i < amount; i++){
-							ILuckBox.addPlayerLuckBox(golemaPlayer.getUUID(), LuckBoxType.LUCKBOX_SKYWARS);
+							ILuckBox.addPlayerLuckBox(UUIDFetcher.getUUID(golemaPlayer.getPlayerRealName()), LuckBoxType.LUCKBOX_SKYWARS);
 						}
 					}
 				}.runTaskAsynchronously(BoxPlugin.get());

@@ -1,10 +1,13 @@
 package tk.hugo4715.golema.santabox.anim;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.ArmorStand;
@@ -12,12 +15,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import com.google.common.collect.Lists;
 
 import net.golema.database.GolemaBukkitDatabase;
 import net.golema.database.golemaplayer.GolemaPlayer;
+import net.golema.database.golemaplayer.UUIDFetcher;
 import net.golema.database.golemaplayer.rank.Rank;
-import net.golema.database.redis.spigot.RedisPubSubSpigot;
-import net.golema.database.support.builder.items.heads.CustomSkull;
 import net.golema.database.support.particle.ParticleEffect;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -28,6 +33,7 @@ import tk.hugo4715.golema.santabox.box.Box;
 import tk.hugo4715.golema.santabox.database.DatabaseManager.Prize;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
 import tk.hugo4715.golema.santabox.util.HologramBuilder;
+import tk.hugo4715.golema.santabox.util.Skull;
 
 public class BoxOpenAnimation {
 	
@@ -36,28 +42,27 @@ public class BoxOpenAnimation {
     	GolemaPlayer gp = GolemaPlayer.getGolemaPlayer(p);
     	
     	try {
-			BoxPlugin.get().getDatabaseManager().addPlayerKeys(p.getUniqueId(), -1);
+			BoxPlugin.get().getDatabaseManager().addPlayerKeys(UUIDFetcher.getUUID(GolemaPlayer.getGolemaPlayer(p).getPlayerRealName()), -1);
 			reward = BoxPlugin.get().getDatabaseManager().choosePrize();
 			BoxPlugin.get().getDatabaseManager().usePrize(reward);
 			BoxPlugin.get().getDatabaseManager().winPrize(p, reward);
+	    	reward.give(gp);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour r�gler le probleme.");
+			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour régler le probleme.");
 		}
     	
-    	reward.give(gp);
-    	
+    	final Prize r = reward;
     	new BukkitRunnable() {
 			int ticks = 0;
-			Prize reward;
 			HologramBuilder holo;
+			HologramBuilder holo2;
 			//orb:
 			//http://textures.minecraft.net/texture/e6799bfaa3a2c63ad85dd378e66d57d9a97a3f86d0d9f683c498632f4f5c
 			//present:
 			//http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5
-			ItemStack head = CustomSkull.getPlayerSkull("http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5");
+			ItemStack head = Skull.getCustomSkull("http://textures.minecraft.net/texture/b5651a18f54714b0b8f7f011c018373b33fd1541ca6f1cfe7a6c97b65241f5"); 
 			ArmorStand stand;
-			
 			
 			float pitch = 0;
 			@Override
@@ -68,14 +73,12 @@ public class BoxOpenAnimation {
 					playChestAction(box.getBoxLocation(), false);
 					box.opening.remove(p.getUniqueId());
 					box.isUsed().set(false);
-					reward.give(gp);
 					cancel();
 					return;
 				}
 				
 				if(stand != null){
-					float speed = (float) Math.sqrt(ticks) * 0.1f;
-					stand.setHeadPose(stand.getHeadPose().add(0, speed, 0));;
+					stand.setHeadPose(stand.getHeadPose().add(0, 0.25, 0));
 					ParticleEffect.FIREWORKS_SPARK.display(0, 0,0, 0.1f, 1, stand.getEyeLocation(), box.getBoxLocation().getWorld().getPlayers());
 				}
 				
@@ -85,6 +88,16 @@ public class BoxOpenAnimation {
 				}
 				
 				
+				
+				
+				
+				for (int i = 0; i < 10; i++) {
+					int a = i * 2;
+					double dx = Math.cos((ticks+a)/5.0)*2;
+					double dy = (Math.min((ticks+a),90)/20.0)-1;
+					double dz = Math.sin((ticks+a)/5.0)*2;
+					ParticleEffect.CLOUD.display(new Vector(0,0,0), 0, box.getBoxLocation().clone().add(dx + 0.5, dy, dz + 0.5),Lists.newArrayList(Bukkit.getOnlinePlayers()));
+				}
 				
 				
 				//one time events
@@ -100,40 +113,48 @@ public class BoxOpenAnimation {
 				}else if(ticks == 60){
 					//show reward here
 					
-					holo = new HologramBuilder();
-					holo.editLocation(box.getBoxLocation().clone().add(0.5, -1, 0.5));
-					holo.editMessage(reward.getRarity().getColor() + reward.getRarity().getFrench());
-					holo.sendToPlayers(box.getBoxLocation().getWorld().getPlayers());
 					
-					reward.give(gp);
 					Rank rank = getRealRank(gp);
+					p.sendMessage(BoxPlugin.PREFIX + "Vous venez d'obtenir " + r.getRarity().getTag() + WordUtils.capitalizeFully(r.getName()) + ChatColor.GREEN + ".");
 					
-					switch(reward.getRarity()){
+					switch(r.getRarity()){
 					case COMMON:
-						p.sendMessage(BoxPlugin.PREFIX + "Vous venez d'obtenir " + reward.getRarity().getTag() + WordUtils.capitalizeFully(reward.getName()) + ChatColor.GREEN + ".");
 						break;
 					case EPIC:
 						Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1));
-						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + reward.getRarity().getTag() + " " + reward.getName());
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + r.getRarity().getTag() + " " + r.getName());
 						break;
 					case LEGENDARY:
+						box.getBoxLocation().getWorld().strikeLightningEffect(box.getBoxLocation());
 						Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 1, 1));
 						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(" ");
-						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + reward.getRarity().getTag() + " " + reward.getName());
+						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(BoxPlugin.PREFIX + rank.getPrefix() + " " + gp.getPlayerRealName() +  ChatColor.YELLOW + " viens d'obtenir " + r.getRarity().getTag() + " " + r.getName());
 						GolemaBukkitDatabase.INSTANCE.redisPubSubSpigot.broadcastMessage(" ");
 						break;
 					}
 					
-					if(!reward.isAutomatic()){
+					if(!r.isAutomatic()){
 						p.sendMessage(BoxPlugin.PREFIX + "Vous pouvez des a present nous contacter en message privé sur twitter " + ChatColor.AQUA + " @GolemaMC" + ChatColor.YELLOW + " pour reclamer votre prix!");
 					}
 					
 					//open chest
 					playChestAction(box.getBoxLocation(), true);
 					
+					holo2 = new HologramBuilder();
+					holo2.editLocation(box.getBoxLocation().clone().add(0.5, -0.5, 0.5));
+					holo2.editMessage(r.getRarity().getColor() + r.getName());
+					holo2.sendToPlayers(box.getBoxLocation().getWorld().getPlayers());
+					
+					
+					holo = new HologramBuilder();
+					holo.editLocation(box.getBoxLocation().clone().add(0.5, -1, 0.5));
+					holo.editMessage(r.getRarity().getColor() + r.getRarity().getFrench());
+					holo.sendToPlayers(box.getBoxLocation().getWorld().getPlayers());
+					
 					stand.remove();
-				}else if(ticks > 100){
+				}else if(ticks > 150){
 					holo.destroyAllPlayers();
+					holo2.destroyAllPlayers();
 					
 					playChestAction(box.getBoxLocation(), false);
 

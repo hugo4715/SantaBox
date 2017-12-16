@@ -16,18 +16,19 @@ import tk.hugo4715.golema.santabox.box.Box;
 import tk.hugo4715.golema.santabox.box.BoxManager;
 import tk.hugo4715.golema.santabox.cmd.SantaCMD;
 import tk.hugo4715.golema.santabox.database.DatabaseManager;
+import tk.hugo4715.golema.santabox.holo.BoxHoloUpdater;
 import tk.hugo4715.golema.santabox.listener.BoxListener;
 import tk.hugo4715.golema.santabox.util.EntityRegistry;
 
 public class BoxPlugin extends JavaPlugin {
-	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "SkyWars" + ChatColor.WHITE + " │ " + ChatColor.YELLOW;
+	public static final String PREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "SantaBox" + ChatColor.WHITE + " │ " + ChatColor.YELLOW;
 	public static boolean DEV;
 	
 	@Getter
 	private BoxManager boxManager;
-	
 	@Getter
 	private DatabaseManager databaseManager;
+	private BoxHoloUpdater holo;
 
 	@Override
 	public void onEnable() {
@@ -45,6 +46,8 @@ public class BoxPlugin extends JavaPlugin {
 		}	
 		
 		Bukkit.getPluginManager().registerEvents(new BoxListener(), this);
+		holo = new BoxHoloUpdater();
+		holo.runTaskTimer(this, 20, 5);
 		
 		
 		getCommand("santabox").setExecutor(new SantaCMD());
@@ -53,6 +56,8 @@ public class BoxPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		EntityRegistry.kill();
+		holo.cancel();
+		holo.clear();
 	}
 
 	public static BoxPlugin get() {

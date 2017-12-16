@@ -30,7 +30,6 @@ public abstract class AbstractGui implements Listener{
         this.buttons = Maps.newHashMap();
         Bukkit.getPluginManager().registerEvents(this, plugin);
         player.openInventory(getInventory(size));
-        update();
         
         if(refreshTicks > 0){
             taskId = new BukkitRunnable(){

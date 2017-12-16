@@ -44,12 +44,12 @@ public class Box implements ConfigurationSerializable {
 		
 		try {
 			if(BoxPlugin.get().getDatabaseManager().getPlayerKeys(p) < 1){
-				p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Vous n'avez pas de clé pour ouvrir une SantaBox, revenez plus tard.");
+				p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Vous n'avez pas de clÃ© pour ouvrir une SantaBox, revenez plus tard.");
 				return;
 			}
 			
 			if(opening.contains(p.getUniqueId())){
-				p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Vous êtes déja en train d'ouvrir une box.");
+				p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Vous etes dÃ©ja en train d'ouvrir une box.");
 				return;
 			}
 			
@@ -65,7 +65,7 @@ public class Box implements ConfigurationSerializable {
 			BoxOpenAnimation.openBox(p, this);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour régler le probleme.");
+			p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Une erreur s'est produite. Merci de contacter un administrateur pour rÃ©gler le probleme.");
 		}
 	}
 	

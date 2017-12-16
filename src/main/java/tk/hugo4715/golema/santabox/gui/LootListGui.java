@@ -1,6 +1,7 @@
 package tk.hugo4715.golema.santabox.gui;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,19 +18,21 @@ import tk.hugo4715.golema.santabox.util.AbstractGui;
 public class LootListGui extends AbstractGui {
 	
 	
-	private List<ItemStack> prizes; 
+	private List<ItemStack> prizes = new ArrayList<>(); 
 	
 	
 	public LootListGui(Player player) {
-		super(BoxPlugin.get(), player, "Liste des lots", 3*9, 10);
+		super(BoxPlugin.get(), player, "Liste des lots", 4*9, 10);
 		
 		try {
-			List<Prize> p = BoxPlugin.get().getDatabaseManager().getPrizes();
+			List<Prize> p = BoxPlugin.get()
+					.getDatabaseManager()
+					.getPrizes();
 			
 			for(Prize prize : p){
 				ItemStack is = new ItemBuilder()
 						.type(prize.getRarity().getMaterial())
-						.name(prize.getRarity().getColor() + prize.getRarity().getFrench())
+						.name(prize.getRarity().getColor() + prize.getRarity().getFrench() + ChatColor.WHITE + " │ " + ChatColor.YELLOW + prize.getName())
 						.lore(ChatColor.GRAY + "Marque: " + ChatColor.GOLD + prize.getMarque())
 						.build();
 				prizes.add(is);
@@ -45,11 +48,13 @@ public class LootListGui extends AbstractGui {
 	
 	@Override
 	public void update() {
-		super.update();
 		
-		for (int i = 0; i < prizes.size(); i++) {
-			inv.setItem(i, prizes.get(i));
+		if(prizes != null) {
+			for (int i = 0; i < prizes.size(); i++) {
+				inv.setItem(i, prizes.get(i));
+			}
 		}
+		
 	}
 	
 }
