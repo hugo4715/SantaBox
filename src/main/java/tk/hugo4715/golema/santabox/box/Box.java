@@ -44,7 +44,7 @@ public class Box implements ConfigurationSerializable {
 		
 		try {
 			if(BoxPlugin.get().getDatabaseManager().getPlayerKeys(p) < 1){
-				p.sendMessage(BoxPlugin.PREFIX + ChatColor.RED + "Vous n'avez pas de clé pour ouvrir une SantaBox, revenez plus tard.");
+				p.sendMessage(BoxPlugin.PREFIX + ChatColor.YELLOW + "Vous n'avez pas de clé pour ouvrir une SantaBox, achetez en sur " + ChatColor.AQUA + "store.golemamc.net");
 				return;
 			}
 			
