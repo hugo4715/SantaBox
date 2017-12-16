@@ -34,7 +34,7 @@ public class DatabaseManager {
 
 	private static final String CREATE_TABLE2 = "CREATE TABLE IF NOT EXISTS `santabox_win` (`id` INTEGER AUTO_INCREMENT, `uuid` VARCHAR(40) NOT NULL, `prize` MEDIUMTEXT NOT NULL, `redeemed` BOOL DEFAULT 0, PRIMARY KEY (`id`));";
 
-	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` ( `id` INTEGER AUTO_INCREMENT, `prize` MEDIUMTEXT NOT NULL, `left` SMALLINT NOT NULL, `proba` FLOAT NOT NULL,`rarity` MEDIUMTEXT NOT NULL, `marque` MEDIUMTEXT NOT NULL, PRIMARY KEY (`id`));";
+	private static final String CREATE_TABLE3 = "CREATE TABLE IF NOT EXISTS `santabox_prizes` ( `id` INTEGER AUTO_INCREMENT, `prize` MEDIUMTEXT NOT NULL, `left` SMALLINT NOT NULL, `proba` DECIMAL NOT NULL,`rarity` MEDIUMTEXT NOT NULL, `marque` MEDIUMTEXT NOT NULL, PRIMARY KEY (`id`));";
 
 	private static final String GET_PRIZES = "SELECT * FROM `santabox_prizes`;";
 	private static final String GET_KEYS_PLAYER = "SELECT * FROM `santabox_keys` WHERE uuid=?;";

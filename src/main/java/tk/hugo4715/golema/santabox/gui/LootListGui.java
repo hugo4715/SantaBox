@@ -48,13 +48,11 @@ public class LootListGui extends AbstractGui {
 	
 	@Override
 	public void update() {
-		
 		if(prizes != null) {
 			for (int i = 0; i < prizes.size(); i++) {
 				inv.setItem(i, prizes.get(i));
 			}
 		}
-		
 	}
 	
 }
