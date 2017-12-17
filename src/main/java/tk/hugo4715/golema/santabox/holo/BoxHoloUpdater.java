@@ -52,39 +52,13 @@ public class BoxHoloUpdater extends BukkitRunnable {
 						List<HologramBuilder> holograms = Lists.newArrayList();
 						HologramBuilder b1 = new HologramBuilder();
 						b1.editLocation(box.getBoxLocation().clone().add(0.5, -0.75, 0.5));
-						b1.editMessage(ChatColor.GOLD + "SantaBox");
+						b1.editMessage(ChatColor.translateAlternateColorCodes('&', "&b&l✿ &c&lSanta&f&lBox &b&l✿"));
 						b1.sendToPlayer(p);
 						holograms.add(b1);
 						
-						System.out.println("created");
 						a.put(box, holograms);
 					}
 				}
-				
-				
-//				if(box.getBoxLocation().getWorld().equals(p.getWorld())){
-//					
-//					if(holos.containsKey(p)){
-//						//player already have his hologram, check if we need to remove it
-//						if(p.getLocation().distanceSquared(box.getBoxLocation()) > 16*16 || box.isUsed().get()){
-//							holos.get(p).forEach(HologramBuilder::destroy);
-//							holos.remove(p);
-//							System.out.println("removed");
-//						}
-//					}else{
-//						if(p.getLocation().distanceSquared(box.getBoxLocation()) < 16*16 && !box.isUsed().get()){
-//							List<HologramBuilder> holograms = Lists.newArrayList();
-//							HologramBuilder b1 = new HologramBuilder();
-//							b1.editLocation(box.getBoxLocation().clone().add(0.5, -0.75, 0.5));
-//							b1.editMessage(ChatColor.GOLD + "SantaBox");
-//							b1.sendToPlayer(p);
-//							holograms.add(b1);
-//							
-//							System.out.println("created");
-//							holos.put(p, holograms);
-//						}
-//					}
-//				}
 			}
 		}
 	}

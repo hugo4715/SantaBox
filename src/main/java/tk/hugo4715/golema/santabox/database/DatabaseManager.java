@@ -23,6 +23,7 @@ import net.golema.database.golemaplayer.UUIDFetcher;
 import net.golema.database.golemaplayer.currency.Currency;
 import net.golema.database.golemaplayer.game.luckbox.ILuckBox;
 import net.golema.database.golemaplayer.game.luckbox.LuckBoxType;
+import net.golema.database.golemaplayer.rank.IRank;
 import net.golema.database.golemaplayer.rank.Rank;
 import tk.hugo4715.golema.santabox.BoxPlugin;
 import tk.hugo4715.golema.santabox.util.RandomCollection;
@@ -163,13 +164,14 @@ public class DatabaseManager {
 						}
 					}
 				}.runTaskAsynchronously(BoxPlugin.get());
-			}else if(name.toLowerCase().contains("vip+")){
+			}else if(name.toLowerCase().contains("VIP+")){
 				if(golemaPlayer.getRankPower() < Rank.VIPPLUS.getPower()){
+					IRank.setPlayerRank(UUIDFetcher.getUUID(golemaPlayer.getPlayerRealName()), Rank.VIPPLUS);
 					golemaPlayer.setRank(Rank.VIPPLUS);
 				}
-			}else if(name.toLowerCase().contains("vip")){
+			}else if(name.toLowerCase().contains("VIP")){
 				if(golemaPlayer.getRankPower() < Rank.VIP.getPower()){
-					golemaPlayer.setRank(Rank.VIP);
+					IRank.setPlayerRank(UUIDFetcher.getUUID(golemaPlayer.getPlayerRealName()), Rank.VIP);
 				}
 			}
 		}
